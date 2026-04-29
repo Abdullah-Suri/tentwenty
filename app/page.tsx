@@ -101,7 +101,7 @@ export default function DashboardPage() {
       }
 
       const res = await fetch(url.toString());
-      if (res.status === 401) return; // Suppress for unauthorized (logout)
+      if (res.status === 401) return;
       const data = await res.json();
       setTimesheets(data.timesheets);
       setTotalPages(data.pagination.totalPages);

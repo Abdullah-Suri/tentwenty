@@ -103,7 +103,7 @@ export default function TimesheetDetailPage() {
     if (!silent) setLoading(true);
     try {
       const res = await fetch(`/api/timesheets/${id}`);
-      if (res.status === 401) return; // Suppress for unauthorized (logout)
+      if (res.status === 401) return;
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setTimesheet(data);
