@@ -38,7 +38,7 @@ interface EntryModalProps {
     hours: number;
     typeOfWork: string;
     projectId: string;
-  };
+  } | null;
 }
 
 export function EntryModal({
