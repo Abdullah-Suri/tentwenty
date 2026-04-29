@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import {
   Tooltip,
@@ -92,14 +92,14 @@ export default function TimesheetDetailPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const [editingEntry, setEditingEntry] = useState<any>(null);
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
   
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [entryIdToDelete, setEntryIdToDelete] = useState<string | null>(null);
 
   const router = useRouter();
 
-  const fetchTimesheet = async (silent = false) => {
+  const fetchTimesheet = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
       const res = await fetch(`/api/timesheets/${id}`);
@@ -116,11 +116,13 @@ export default function TimesheetDetailPage() {
     } finally {
       if (!silent) setLoading(false);
     }
-  };
+  }, [id, router]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     fetchTimesheet();
-  }, [id]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [fetchTimesheet]);
 
   const confirmDelete = async () => {
     if (!entryIdToDelete) return;

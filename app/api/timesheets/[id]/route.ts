@@ -15,10 +15,10 @@ export async function GET(
   }
 
   try {
-    const timesheet = await prisma.timesheet.findUnique({
+    const timesheet = await prisma.timesheet.findFirst({
       where: {
         id: resolvedParams.id,
-        userId: (session.user as any).id,
+        userId: session.user.id,
       },
       include: {
         entries: {

@@ -22,7 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowDown, Calendar as CalendarIcon, ChevronDown } from "lucide-react";
+import { ArrowDown, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -88,7 +88,7 @@ export default function DashboardPage() {
       url.searchParams.append("limit", limit.toString());
       url.searchParams.append("sortBy", sortBy);
       url.searchParams.append("sortOrder", sortOrder);
-      
+
       if (statusFilter !== "all") {
         url.searchParams.append("status", statusFilter);
       }
@@ -177,7 +177,7 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col bg-muted/30">
       <Header />
-      
+
       <main className="flex-1 container mx-auto px-4 pt-10">
         <div className="bg-card text-card-foreground rounded-xl border shadow-sm overflow-hidden">
           <div className="p-8 space-y-8">
@@ -226,7 +226,7 @@ export default function DashboardPage() {
               <Table className="min-w-[600px] lg:min-w-full">
                 <TableHeader className="bg-white dark:bg-muted/10 border-b">
                   <TableRow className="hover:bg-transparent border-none">
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer text-[12px] font-bold uppercase tracking-wider text-[#6B7280] py-4"
                       onClick={() => toggleSort("weekNumber")}
                     >
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                         WEEK # <ArrowDown className={cn("h-3 w-3 transition-transform", sortBy === "weekNumber" && sortOrder === "asc" && "rotate-180")} />
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer text-[12px] font-bold uppercase tracking-wider text-[#6B7280] py-4"
                       onClick={() => toggleSort("startDate")}
                     >
@@ -242,7 +242,7 @@ export default function DashboardPage() {
                         DATE <ArrowDown className={cn("h-3 w-3 transition-transform", sortBy === "startDate" && sortOrder === "asc" && "rotate-180")} />
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer text-[12px] font-bold uppercase tracking-wider text-[#6B7280] py-4"
                       onClick={() => toggleSort("status")}
                     >
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                         <TableCell className="py-6 text-[#4B5563] dark:text-muted-foreground">{formatDateRange(ts.startDate, ts.endDate)}</TableCell>
                         <TableCell className="py-6 text-center">{getStatusBadge(ts.status)}</TableCell>
                         <TableCell className="py-6 text-right pr-8">
-                          <Link 
+                          <Link
                             href={`/timesheets/${ts.id}`}
                             className="text-primary font-medium hover:underline"
                           >
@@ -298,7 +298,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex items-center rounded-xl border border-[#E5E7EB] dark:border-muted overflow-hidden shadow-sm">
-                <button 
+                <button
                   className="h-10 px-4 text-sm font-medium border-r bg-white dark:bg-muted/10 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                     {item}
                   </button>
                 ))}
-                <button 
+                <button
                   className="h-10 px-4 text-sm font-medium bg-white dark:bg-muted/10 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}

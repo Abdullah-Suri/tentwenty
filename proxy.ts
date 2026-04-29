@@ -11,12 +11,14 @@ export default withAuth(
       if (isAuth) {
         return NextResponse.redirect(new URL("/", req.url));
       }
-      return null;
+      return NextResponse.next();
     }
 
     if (!isAuth) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
+
+    return NextResponse.next();
   },
   {
     callbacks: {

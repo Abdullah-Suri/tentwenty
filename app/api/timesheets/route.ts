@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "5");
-  const status = searchParams.get("status");
+  const statusFilter = searchParams.get("status");
   const dateFrom = searchParams.get("dateFrom");
   const dateTo = searchParams.get("dateTo");
   const sortBy = searchParams.get("sortBy") || "startDate";
@@ -21,21 +22,21 @@ export async function GET(request: Request) {
 
   const skip = (page - 1) * limit;
 
-  const where: any = {
-    userId: (session.user as any).id,
+  const where: Prisma.TimesheetWhereInput = {
+    userId: session.user.id,
   };
 
-  if (status && status !== "all") {
-    where.status = status;
+  if (statusFilter && statusFilter !== "all") {
+    where.status = statusFilter as "COMPLETED" | "INCOMPLETE" | "MISSING";
   }
 
   if (dateFrom || dateTo) {
     where.AND = [];
     if (dateFrom) {
-      where.AND.push({ endDate: { gte: new Date(dateFrom) } });
+      (where.AND as Prisma.TimesheetWhereInput[]).push({ endDate: { gte: new Date(dateFrom) } });
     }
     if (dateTo) {
-      where.AND.push({ startDate: { lte: new Date(dateTo) } });
+      (where.AND as Prisma.TimesheetWhereInput[]).push({ startDate: { lte: new Date(dateTo) } });
     }
   }
 

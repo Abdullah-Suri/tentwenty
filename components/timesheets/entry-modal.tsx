@@ -62,21 +62,17 @@ export function EntryModal({
       .then((data) => setProjects(data));
   }, []);
 
+  // Reset form when modal opens or initialData changes
   useEffect(() => {
     if (isOpen) {
-      if (initialData) {
-        setProjectId(initialData.projectId);
-        setTypeOfWork(initialData.typeOfWork);
-        setTaskDescription(initialData.taskDescription);
-        setHours(initialData.hours);
-      } else {
-        setProjectId("");
-        setTypeOfWork("");
-        setTaskDescription("");
-        setHours(0);
-      }
+      /* eslint-disable react-hooks/set-state-in-effect */
+      setProjectId(initialData?.projectId || "");
+      setTypeOfWork(initialData?.typeOfWork || "");
+      setTaskDescription(initialData?.taskDescription || "");
+      setHours(initialData?.hours || 0);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [initialData, isOpen]);
+  }, [isOpen, initialData]);
 
   const validate = () => {
     if (!projectId) {
