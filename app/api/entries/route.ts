@@ -31,6 +31,15 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { date, taskDescription, hours, typeOfWork, projectId, timesheetId } = body;
 
+    // Validation
+    if (!date || !taskDescription || hours === undefined || !typeOfWork || !projectId || !timesheetId) {
+      return NextResponse.json({ error: "All fields marked with * are required." }, { status: 400 });
+    }
+
+    if (isNaN(parseFloat(hours)) || parseFloat(hours) <= 0) {
+      return NextResponse.json({ error: "Hours must be a number greater than 0." }, { status: 400 });
+    }
+
     const entry = await prisma.entry.create({
       data: {
         date: new Date(date),
@@ -62,12 +71,25 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { id, date, taskDescription, hours, typeOfWork, projectId } = body;
 
+    if (!id) {
+      return NextResponse.json({ error: "Missing entry ID." }, { status: 400 });
+    }
+
+    // Validation
+    if (!taskDescription || hours === undefined || !typeOfWork || !projectId) {
+      return NextResponse.json({ error: "All fields marked with * are required." }, { status: 400 });
+    }
+
+    if (isNaN(parseFloat(hours)) || parseFloat(hours) <= 0) {
+      return NextResponse.json({ error: "Hours must be a number greater than 0." }, { status: 400 });
+    }
+
     const existingEntry = await prisma.entry.findUnique({
       where: { id },
     });
 
     if (!existingEntry) {
-      return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+      return NextResponse.json({ error: "Entry not found." }, { status: 404 });
     }
 
     const entry = await prisma.entry.update({
@@ -75,7 +97,7 @@ export async function PUT(request: Request) {
       data: {
         date: date ? new Date(date) : undefined,
         taskDescription,
-        hours: hours ? parseFloat(hours) : undefined,
+        hours: parseFloat(hours),
         typeOfWork,
         projectId,
       },
@@ -101,7 +123,7 @@ export async function DELETE(request: Request) {
   const id = searchParams.get("id");
 
   if (!id) {
-    return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+    return NextResponse.json({ error: "Missing ID." }, { status: 400 });
   }
 
   try {
@@ -110,7 +132,7 @@ export async function DELETE(request: Request) {
     });
 
     if (!existingEntry) {
-      return NextResponse.json({ error: "Entry not found" }, { status: 404 });
+      return NextResponse.json({ error: "Entry not found." }, { status: 404 });
     }
 
     await prisma.entry.delete({

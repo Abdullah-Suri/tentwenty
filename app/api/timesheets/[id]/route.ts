@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
+  const resolvedParams = await params;
 
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,7 +17,7 @@ export async function GET(
   try {
     const timesheet = await prisma.timesheet.findUnique({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         userId: (session.user as any).id,
       },
       include: {

@@ -3,11 +3,16 @@ import "./globals.css"
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const inter = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-sans',
+  display: 'swap',
+})
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: 'swap',
 })
 
 export default function RootLayout({
@@ -19,9 +24,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
     >
-      <body>
+      <body className={cn(
+        "min-h-screen bg-background font-sans antialiased",
+        inter.variable,
+        fontMono.variable
+      )}>
         <Providers>{children}</Providers>
       </body>
     </html>

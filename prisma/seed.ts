@@ -5,6 +5,11 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  console.log("Cleaning up database...");
+  await prisma.entry.deleteMany({});
+  await prisma.timesheet.deleteMany({});
+  // Keep users and projects to avoid breaking relations
+
   // 1. Create Default User
   const hashedPassword = await bcrypt.hash("password123", 10);
   const user = await prisma.user.upsert({
@@ -31,12 +36,13 @@ async function main() {
     projects.push(project);
   }
 
-  console.log(`Created ${projects.length} projects`);
+  console.log(`Ensured ${projects.length} projects exist`);
 
   // 3. Create Sample Timesheets and Entries
-  // Let's create data for the last 5 weeks
+  // Let's create data for the last 20 weeks to test pagination
   const today = new Date();
-  for (let i = 0; i < 5; i++) {
+  
+  for (let i = 0; i < 20; i++) {
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay() - (i * 7)); // Start of week (Sunday)
     weekStart.setHours(0, 0, 0, 0);
@@ -45,30 +51,24 @@ async function main() {
     weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
     weekEnd.setHours(23, 59, 59, 999);
 
-    const weekNumber = 17 - i; // Arbitrary week numbers for demo
+    const weekNumber = 52 - i; // Using actual week numbers descending
 
     // Create Timesheet
-    const timesheet = await prisma.timesheet.upsert({
-      where: {
-        userId_weekNumber_startDate: {
-          userId: user.id,
-          weekNumber,
-          startDate: weekStart,
-        },
-      },
-      update: {},
-      create: {
+    const timesheet = await prisma.timesheet.create({
+      data: {
         userId: user.id,
         weekNumber,
         startDate: weekStart,
         endDate: weekEnd,
-        status: i === 0 ? "INCOMPLETE" : "COMPLETED", // Make the latest one incomplete
+        status: "MISSING", // Default
       },
     });
 
-    // Create some entries for the timesheet
-    if (i !== 4) { // Let one week be MISSING (no entries)
-      const numEntries = i === 0 ? 5 : 10; // Fewer entries for the incomplete one
+    // Randomize status for variety
+    const randomStatus = i === 0 ? "INCOMPLETE" : i % 3 === 0 ? "MISSING" : i % 4 === 0 ? "INCOMPLETE" : "COMPLETED";
+
+    if (randomStatus !== "MISSING") {
+      const numEntries = randomStatus === "INCOMPLETE" ? 4 : 10;
       for (let j = 0; j < numEntries; j++) {
         const entryDate = new Date(weekStart);
         entryDate.setDate(weekStart.getDate() + (j % 7));
@@ -77,7 +77,7 @@ async function main() {
           data: {
             date: entryDate,
             taskDescription: `Task ${j + 1} for week ${weekNumber}`,
-            hours: i === 0 ? 4 : 4, // 4 hours per entry
+            hours: 4, // 4 hours per entry
             typeOfWork: j % 2 === 0 ? "Development" : "Design",
             projectId: projects[j % projects.length].id,
             timesheetId: timesheet.id,
@@ -85,26 +85,20 @@ async function main() {
         });
       }
 
-      // Update timesheet status based on total hours
-      const totalHours = (i === 0 ? 5 : 10) * 4;
-      let status: "COMPLETED" | "INCOMPLETE" | "MISSING" = "MISSING";
-      if (totalHours >= 40) status = "COMPLETED";
-      else if (totalHours > 0) status = "INCOMPLETE";
+      // Update actual status based on hours
+      const totalHours = numEntries * 4;
+      let finalStatus: "COMPLETED" | "INCOMPLETE" | "MISSING" = "MISSING";
+      if (totalHours >= 40) finalStatus = "COMPLETED";
+      else if (totalHours > 0) finalStatus = "INCOMPLETE";
 
       await prisma.timesheet.update({
         where: { id: timesheet.id },
-        data: { status },
+        data: { status: finalStatus },
       });
-    } else {
-        // Week 4 is MISSING (no entries)
-        await prisma.timesheet.update({
-            where: { id: timesheet.id },
-            data: { status: "MISSING" }
-        });
     }
   }
 
-  console.log("Seed data created successfully!");
+  console.log("Seed data for 20 weeks created successfully!");
 }
 
 main()

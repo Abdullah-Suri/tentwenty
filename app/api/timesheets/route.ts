@@ -16,6 +16,8 @@ export async function GET(request: Request) {
   const status = searchParams.get("status");
   const dateFrom = searchParams.get("dateFrom");
   const dateTo = searchParams.get("dateTo");
+  const sortBy = searchParams.get("sortBy") || "startDate";
+  const sortOrder = searchParams.get("sortOrder") || "desc";
 
   const skip = (page - 1) * limit;
 
@@ -23,14 +25,18 @@ export async function GET(request: Request) {
     userId: (session.user as any).id,
   };
 
-  if (status) {
+  if (status && status !== "all") {
     where.status = status;
   }
 
   if (dateFrom || dateTo) {
-    where.startDate = {};
-    if (dateFrom) where.startDate.gte = new Date(dateFrom);
-    if (dateTo) where.startDate.lte = new Date(dateTo);
+    where.AND = [];
+    if (dateFrom) {
+      where.AND.push({ endDate: { gte: new Date(dateFrom) } });
+    }
+    if (dateTo) {
+      where.AND.push({ startDate: { lte: new Date(dateTo) } });
+    }
   }
 
   try {
@@ -39,7 +45,7 @@ export async function GET(request: Request) {
         where,
         skip,
         take: limit,
-        orderBy: { startDate: "desc" },
+        orderBy: { [sortBy]: sortOrder },
         include: {
           _count: {
             select: { entries: true },
