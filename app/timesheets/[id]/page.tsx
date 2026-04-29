@@ -302,7 +302,7 @@ export default function TimesheetDetailPage() {
                     <button 
                       onClick={() => openAddModal(day.toISOString())}
                       className={cn(
-                        "w-full py-3 flex items-center justify-center gap-2 rounded-lg border border-dashed border-[#E5E7EB] dark:border-muted text-muted-foreground hover:bg-[#EFF6FF] hover:border-primary/50 hover:text-primary transition-all",
+                        "cursor-pointer w-full py-3 flex items-center justify-center gap-2 rounded-lg border border-dashed border-[#E5E7EB] dark:border-muted text-muted-foreground hover:bg-[#EFF6FF] hover:border-primary/50 hover:text-primary transition-all",
                         entries.length === 0 && "bg-transparent"
                       )}
                     >
