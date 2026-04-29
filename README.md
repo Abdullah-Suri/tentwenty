@@ -39,13 +39,18 @@ A modern, full-stack Timesheet Management application built with Next.js 16, Pri
 
 ---
 
+##  User Credentials (Demo)
+- **Email**: `admin@tentwenty.com`
+- **Password**: `password123`
+
+---
+
 ##  Frameworks & Libraries
 
 - **Framework**: Next.js 16 (App Router, Turbopack)
 - **Database**: Prisma ORM with PostgreSQL
 - **Authentication**: NextAuth.js
 - **Styling**: Tailwind CSS & Shadcn UI
-- **Animations**: Framer Motion
 - **Testing**: Vitest & React Testing Library
 - **Notifications**: Goey-Toast
 
